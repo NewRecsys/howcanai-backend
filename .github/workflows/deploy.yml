@@ -7,8 +7,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Rsync
-        run: sudo apt install -y rsync
       - uses: actions/checkout@v2
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
