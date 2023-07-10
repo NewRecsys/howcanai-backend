@@ -6,9 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-origins = [
-    "https://howcan.ai",
-]
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,
