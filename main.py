@@ -6,8 +6,8 @@ from pydantic import BaseModel
 app = FastAPI()
 
 class Completion(BaseModel):
-    model: str | None = None
-    prompt: str | None = None
+    model: str
+    prompt: str
 
 @app.post("/v1/chat/completions")
 def chat(completion: Completion):
