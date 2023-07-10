@@ -27,4 +27,4 @@ jobs:
           script: |
             cd /opt/ml/backend
             ps aux | grep gunicorn | awk '{ print $2 }' | xargs kill
-            uvicorn --port 30005 main:app
+            uvicorn --port 30005 main:app &
