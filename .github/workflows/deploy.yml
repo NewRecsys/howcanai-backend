@@ -17,14 +17,14 @@ jobs:
         run: ssh-keyscan -p ${{ secrets.SSH_PORT}} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Deploy with rsync
         run: rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" ./ root@${{ secrets.SSH_HOST }}:/opt/ml/backend
-      - name: Restart Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd /opt/ml/backend
-            ps aux | grep uvicorn | awk '{ print $2 }' | xargs kill  || true
-            uvicorn  --host 0.0.0.0 --port 30005 main:app &
+      # - name: Restart Server
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: root
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     port: ${{ secrets.SSH_PORT }}
+      #     script: |
+      #       cd /opt/ml/backend
+      #       ps aux | grep uvicorn | awk '{ print $2 }' | xargs kill  || true
+      #       uvicorn  --host 0.0.0.0 --port 30005 main:app &
