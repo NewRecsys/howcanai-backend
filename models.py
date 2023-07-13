@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, ARRAY
 from database import Base
 
 # Chatroom 모델
@@ -17,6 +17,15 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    password = Column(String, nullable=False)
     email = Column(Text, unique=True, nullable=False)
     
+# Qna 모델
+class Qna(Base):
+    __tablename__ = "qna"
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, nullable=False)
+    question = Column(String, nullable=False)
+    answer = Column(String, nullable=False)
+    references = Column(ARRAY(String), nullable=False)
+    create_date = Column(DateTime, nullable=False)
