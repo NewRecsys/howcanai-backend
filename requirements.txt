@@ -12,3 +12,5 @@ sentence_transformers==2.2.2
 SQLAlchemy==2.0.18
 starlette==0.28.0
 uvicorn==0.22.0
+python-mulipart
+pydantic[email]
