@@ -1,12 +1,16 @@
-from typing import Union
-
 from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
+
+from domain.chatroom import chatroom_router
+from domain.user import user_router
+
+import uvicorn
 
 app = FastAPI()
 
-origins = ['*']
+origins = [
+    "http://127.0.0.1:8080",
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,27 +20,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Completion(BaseModel):
-    model: str
-    prompt: str
 
-@app.post("/v1/chat/completions")
-def chat(completion: Completion):
-    return {
-      "id": "chatcmpl-123",
-      "object": "chat.completion",
-      "created": 1677652288,
-      "choices": [{
-        "index": 0,
-        "message": {
-          "role": "assistant",
-          "content": "\n\nHello there, how may I assist you today?",
-        },
-        "finish_reason": "stop"
-      }],
-      "usage": {
-        "prompt_tokens": 9,
-        "completion_tokens": 12,
-        "total_tokens": 21
-      }
-    }
+app.include_router(chatroom_router.router)
+app.include_router(user_router.router)
+
+if __name__ == '__main__':
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    # uvicorn.run(app, host="0.0.0.0", port=8000)
