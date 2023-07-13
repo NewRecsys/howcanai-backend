@@ -1,9 +1,19 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import yaml
 
 # 데이터베이스 접속 주소
-SQLALCHEMY_DATABASE_URL = "sqlite:///./myapi.db"
+
+with open('env.yaml', 'r') as yaml_conf:
+    conf = yaml.safe_load(yaml_conf)
+DB = conf['DATABASE']
+db_user = DB['USER']
+db_host = DB['HOST']
+db_password = DB['PASSWORD']
+db_port = DB['PORT']
+db_database = DB['DB']
+SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
 
 # create_engine: 커넥션 풀을 생성, 데이터베이스에 접속하는 객체를 일정 갯수만큼 만들어 놓고 돌려가며 사용하는 것
 engine = create_engine(
