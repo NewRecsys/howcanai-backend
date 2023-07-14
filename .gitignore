@@ -1,6 +1,5 @@
 env.yaml
 alembic.ini
-
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

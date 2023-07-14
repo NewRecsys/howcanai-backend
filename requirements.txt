@@ -14,3 +14,4 @@ starlette==0.28.0
 uvicorn==0.22.0
 python-mulipart
 pydantic[email]
+pyyaml
