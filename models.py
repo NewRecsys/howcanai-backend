@@ -24,7 +24,6 @@ class Qna(Base):
     __tablename__ = "qna"
     
     id = Column(Integer, primary_key=True)
-    # user_id = Column(Integer, nullable=False)
     question = Column(String, nullable=False)
     answer = Column(String, nullable=False)
     references = Column(ARRAY(Text), nullable=False)
