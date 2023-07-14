@@ -15,3 +15,4 @@ uvicorn==0.22.0
 python-mulipart
 pydantic[email]
 pyyaml
+psycopg2
