@@ -8,7 +8,7 @@ class Qna(BaseModel):
     user_id: int
     question: str
     answer: str
-    referneces = []
+    references = []
     create_date: datetime.datetime
     
     # Qna 모델의 항목들이 자동으로 Qna 스키마로 매핑 됨
