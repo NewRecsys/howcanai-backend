@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ARRAY
+from sqlalchemy import Column, Integer, String, Text, DateTime, ARRAY, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
 
 # Chatroom 모델
@@ -6,8 +7,9 @@ class Chatroom(Base):
     __tablename__ = "chatroom"
     
     id = Column(Integer, primary_key=True)
-    question = Column(Text, nullable=False)
-    answer = Column(Text, nullable=False)
+    title = Column(String, nullable=False)
+    # question = Column(Text, nullable=False)
+    # answer = Column(Text, nullable=False)
     create_date = Column(DateTime, nullable=False)
 
 # User 모델
@@ -28,3 +30,5 @@ class Qna(Base):
     answer = Column(String, nullable=False)
     references = Column(ARRAY(Text), nullable=False)
     create_date = Column(DateTime, nullable=False)
+    chatroom_id = Column(Integer, ForeignKey("chatroom.id"))
+    chatroom = relationship("Chatroom", backref="qnas")
