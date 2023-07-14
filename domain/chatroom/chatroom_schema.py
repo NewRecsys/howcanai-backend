@@ -9,7 +9,7 @@ class Chatroom(BaseModel):
     id: int
     title: str
     create_date: datetime.datetime
-    qnas: list[Qna] = []
+    qnas: list[Qna]
     
     # CharRoom 모델의 항목들이 자동으로 Chatroom 스키마로 매핑 됨
     class Config:
