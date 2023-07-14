@@ -1,5 +1,6 @@
 env.yaml
 alembic.ini
+chat/API.yaml
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
