@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.get("/list", response_model = List[qna_schema.Qna])
 def qna_list(db: Session = Depends(get_db)):
-    _qna_list = qna_crud.get_qna(db)
+    _qna_list = qna_crud.get_qna_list(db)
     return _qna_list
 
 
