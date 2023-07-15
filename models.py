@@ -8,9 +8,9 @@ class Chatroom(Base):
     
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
-    # question = Column(Text, nullable=False)
-    # answer = Column(Text, nullable=False)
     create_date = Column(DateTime, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    user = relationship("User", backref="chatroom_users")
 
 # User 모델
 class User(Base):
@@ -32,3 +32,5 @@ class Qna(Base):
     create_date = Column(DateTime, nullable=False)
     chatroom_id = Column(Integer, ForeignKey("chatroom.id"))
     chatroom = relationship("Chatroom", backref="qnas")
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    user = relationship("User", backref="qna_users")
