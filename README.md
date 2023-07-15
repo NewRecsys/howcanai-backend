@@ -1,6 +1,7 @@
 # howcanai-backend
 
-FastAPI, PostgreSQL, SQLAlchemy
+- Python 3.8+
+- FastAPI, PostgreSQL, SQLAlchemy
 
 ## local
 ```
