@@ -1,4 +1,4 @@
-from models import Qna, Chatroom
+from models import Qna, Chatroom, User
 from domain.qna.qna_schema import QnaCreate
 from sqlalchemy.orm import Session
 from chat.run import run_chat
@@ -14,7 +14,7 @@ def get_qna_list(db: Session):
 
 
 
-def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate):
+def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate, user: User):
     answer_, references_ = run_chat(args, query = qna_create.query)
     db_qna = Qna(
         question=qna_create.query,
@@ -22,6 +22,7 @@ def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate):
         references=references_,
         create_date=datetime.now(),
         chatroom=chatroom,
+        user=user,
     )
     db.add(db_qna)
     db.commit()

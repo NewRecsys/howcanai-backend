@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
 from domain.chatroom import chatroom_schema, chatroom_crud
+from domain.user.user_router import get_current_user
+from models import User
 from starlette import status
 
 router = APIRouter(
@@ -21,6 +23,6 @@ def chatroom_detail(chatroom_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
-def chatroom_create(_chatroom_create: chatroom_schema.ChatroomCreate, db: Session = Depends(get_db)):
-    chatroom_crud.create_chatroom(db=db, chatroom_create=_chatroom_create)
+def chatroom_create(_chatroom_create: chatroom_schema.ChatroomCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    chatroom_crud.create_chatroom(db=db, chatroom_create=_chatroom_create, user=current_user)
     
