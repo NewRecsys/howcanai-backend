@@ -18,12 +18,10 @@ def qna_list(db: Session = Depends(get_db)):
     return _qna_list
 
 
-@router.post("/create/{chatroom_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/create/{chatroom_id}")
 def qna_create(chatroom_id: int, _qna_create: qna_schema.QnaCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     chatroom = chatroom_crud.get_chatroom(db, chatroom_id=chatroom_id)
     if not chatroom:
         raise HTTPException(status_code=404, detail="Chatroom not found")
-    qna_crud.create_qna(db=db, chatroom=chatroom, qna_create=_qna_create, user=current_user)
-
-
-    
+    question, answer, references, time = qna_crud.create_qna(db=db, chatroom=chatroom, qna_create=_qna_create, user=current_user)
+    return { 'question' : question, 'answer' : answer, 'references' : references, 'time': time }
