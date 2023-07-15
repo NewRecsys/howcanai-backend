@@ -25,6 +25,7 @@ def create_chatroom(db: Session, chatroom_create: ChatroomCreate, user: User = N
                            )
     db.add(db_chatroom)
     db.commit()
+    return db_chatroom.id
 
 
     

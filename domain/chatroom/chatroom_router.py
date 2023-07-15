@@ -21,10 +21,10 @@ def chatroom_detail(chatroom_id: int, db: Session = Depends(get_db)):
     chatroom = chatroom_crud.get_chatroom(db, chatroom_id=chatroom_id)
     return chatroom
 
-@router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/create")
 def chatroom_create(_chatroom_create: chatroom_schema.ChatroomCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    chatroom_crud.create_chatroom(db=db, chatroom_create=_chatroom_create, user=current_user)
-
+    chatroom_id = chatroom_crud.create_chatroom(db=db, chatroom_create=_chatroom_create, user=current_user)
+    return { 'chatroom_id' : chatroom_id }
 
 @router.get("/list/{user_id}", response_model = List[chatroom_schema.Chatroom])
 def chatroom_list_user(user_id: int, db: Session = Depends(get_db)):
