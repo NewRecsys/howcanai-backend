@@ -16,7 +16,7 @@ import secrets
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = secrets.token_hex(32)
 ALGORITHM = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(toeknUrl="/api/user/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
 router = APIRouter(
     prefix="/api/user",
