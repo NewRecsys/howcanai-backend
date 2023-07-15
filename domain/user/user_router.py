@@ -10,13 +10,13 @@ from starlette import status
 from database import get_db
 from domain.user import user_crud, user_schema
 from domain.user.user_crud import pwd_context
-
+from typing import Optional
 import secrets
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = secrets.token_hex(32)
 ALGORITHM = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", auto_error=False)
 
 router = APIRouter(
     prefix="/api/user",
@@ -56,6 +56,10 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 
 def get_current_user(token: str = Depends(oauth2_scheme),
                      db: Session = Depends(get_db)):
+    
+    if not token:
+        return None
+    # 로그인
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

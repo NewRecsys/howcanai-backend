@@ -24,3 +24,5 @@ def qna_create(chatroom_id: int, _qna_create: qna_schema.QnaCreate, db: Session 
     if not chatroom:
         raise HTTPException(status_code=404, detail="Chatroom not found")
     qna_crud.create_qna(db=db, chatroom=chatroom, qna_create=_qna_create, user=current_user)
+    
+    

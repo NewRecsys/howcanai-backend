@@ -13,10 +13,22 @@ def get_chatroom(db: Session, chatroom_id: int):
     chatroom = db.query(Chatroom).get(chatroom_id)
     return chatroom
 
-def create_chatroom(db: Session, chatroom_create: ChatroomCreate, user: User):
+# def create_chatroom(db: Session, chatroom_create: ChatroomCreate, user: User):
+#     db_chatroom = Chatroom(title=chatroom_create.title,
+#                            create_date=datetime.now(),
+#                            user=user,
+#                            )
+#     db.add(db_chatroom)
+#     db.commit()
+
+def create_chatroom(db: Session, chatroom_create: ChatroomCreate, user: User = None):
     db_chatroom = Chatroom(title=chatroom_create.title,
                            create_date=datetime.now(),
                            user=user,
                            )
     db.add(db_chatroom)
     db.commit()
+
+
+    
+    
