@@ -27,6 +27,6 @@ def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate, user: Use
     )
     db.add(db_qna)
     db.commit()
-    return qna_create.query, answer_, references_, now
+    return db_qna.id, qna_create.query, answer_, references_, now
     
     
