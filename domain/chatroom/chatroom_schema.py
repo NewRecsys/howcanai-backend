@@ -23,3 +23,6 @@ class ChatroomCreate(BaseModel):
         if not v or not v.strip():
             raise ValueError('빈 값은 허용되지 않습니다.')
         return v
+
+class ChatroomUpdate(ChatroomCreate):
+    chatroom_id: int
