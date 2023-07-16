@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from domain.chatroom.chatroom_schema import ChatroomCreate
+from domain.chatroom.chatroom_schema import ChatroomCreate, ChatroomUpdate
 
 from models import Chatroom, User
 from sqlalchemy.orm import Session
@@ -27,6 +27,7 @@ def create_chatroom(db: Session, chatroom_create: ChatroomCreate, user: User = N
     db.commit()
     return db_chatroom.id
 
-
-    
-    
+def update_chatroom(db: Session, db_chatroom: Chatroom, chatroom_update: ChatroomUpdate):
+    db_chatroom.title = chatroom_update.title
+    db.add(db_chatroom)
+    db.commit()
