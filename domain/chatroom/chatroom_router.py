@@ -27,7 +27,7 @@ def chatroom_create(_chatroom_create: chatroom_schema.ChatroomCreate, db: Sessio
     return { 'chatroom_id' : chatroom_id }
 
 @router.get("/list/{user_id}", response_model = List[chatroom_schema.Chatroom])
-def chatroom_list_user(user_id: int, db: Session = Depends(get_db)):
+def chatroom_list_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     _chatroom_list = chatroom_crud.get_chatroom_list_user(db, user_id)
     return _chatroom_list
 
