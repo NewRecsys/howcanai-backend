@@ -16,7 +16,8 @@ import secrets
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = secrets.token_hex(32)
 ALGORITHM = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", auto_error=False)
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", auto_error=False) # 비로그인도 일단 API 실행
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", auto_error=True) # 비로그인은 즉시 401 오류 발생
 
 router = APIRouter(
     prefix="/api/user",
