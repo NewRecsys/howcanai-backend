@@ -3,10 +3,11 @@ from typing import List
 from pydantic import BaseModel, validator
 
 from domain.qna.qna_schema import Qna
+from uuid import UUID
 
 # Chatroom 스키마
 class Chatroom(BaseModel):
-    id: int
+    id: UUID
     title: str
     create_date: datetime.datetime
     qnas: List[Qna]
@@ -25,4 +26,4 @@ class ChatroomCreate(BaseModel):
         return v
 
 class ChatroomUpdate(ChatroomCreate):
-    chatroom_id: int
+    chatroom_id: UUID

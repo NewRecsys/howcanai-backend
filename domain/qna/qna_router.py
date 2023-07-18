@@ -7,6 +7,7 @@ from domain.chatroom import chatroom_crud
 from starlette import status
 from domain.user.user_router import get_current_user
 from models import User
+from uuid import UUID
 
 router = APIRouter(
     prefix="/api/qna",
@@ -19,7 +20,7 @@ router = APIRouter(
 
 
 @router.post("/create/{chatroom_id}")
-def qna_create(chatroom_id: int, _qna_create: qna_schema.QnaCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def qna_create(chatroom_id: UUID, _qna_create: qna_schema.QnaCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     chatroom = chatroom_crud.get_chatroom(db, chatroom_id=chatroom_id)
     if chatroom.user_id != current_user.id:
         raise HTTPException(

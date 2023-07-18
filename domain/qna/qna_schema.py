@@ -1,10 +1,11 @@
 import datetime
 from typing import List
 from pydantic import BaseModel, validator
+from uuid import UUID
 
 # Qna 스키마
 class Qna(BaseModel):
-    id: int
+    id: UUID
     question: str
     answer: str
     references: List[str]
