@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from domain.chatroom.chatroom_schema import ChatroomCreate, ChatroomUpdate
 
@@ -9,11 +10,11 @@ def get_chatroom_list(db: Session):
     chatroom_list = db.query(Chatroom).order_by(Chatroom.create_date.desc()).all()
     return chatroom_list
 
-def get_chatroom_list_user(db: Session, user_id: int):
+def get_chatroom_list_user(db: Session, user_id: UUID):
     chatroom_list = db.query(Chatroom).filter(Chatroom.user_id == user_id).order_by(Chatroom.create_date.desc()).all()
     return chatroom_list
 
-def get_chatroom(db: Session, chatroom_id: int):
+def get_chatroom(db: Session, chatroom_id: UUID):
     chatroom = db.query(Chatroom).get(chatroom_id)
     return chatroom
 
