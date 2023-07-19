@@ -18,7 +18,7 @@ router = APIRouter(
 #     return _chatroom_list
 
 
-@router.get("/list", response_model = List[chatroom_schema.Chatroom])
+@router.get("/list", response_model = List[chatroom_schema.ChatroomList])
 def chatroom_list(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     _chatroom_list = chatroom_crud.get_chatroom_list_user(db, current_user.id)
     return _chatroom_list

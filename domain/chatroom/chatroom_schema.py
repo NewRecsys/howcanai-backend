@@ -15,7 +15,16 @@ class Chatroom(BaseModel):
     # CharRoom 모델의 항목들이 자동으로 Chatroom 스키마로 매핑 됨
     class Config:
         orm_mode = True
-        
+
+class ChatroomList(BaseModel):
+    id: UUID
+    title: str
+    create_date: datetime.datetime
+    
+    # CharRoom 모델의 항목들이 자동으로 Chatroom 스키마로 매핑 됨
+    class Config:
+        orm_mode = True
+
 class ChatroomCreate(BaseModel):
     title: str = 'New Chat'
     
