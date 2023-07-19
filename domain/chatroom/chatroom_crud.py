@@ -32,3 +32,7 @@ def update_chatroom(db: Session, db_chatroom: Chatroom, chatroom_update: Chatroo
     db_chatroom.title = chatroom_update.title
     db.add(db_chatroom)
     db.commit()
+
+def delete_chatroom(db: Session, db_chatroom: Chatroom):
+    db.delete(db_chatroom)
+    db.commit()

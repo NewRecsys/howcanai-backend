@@ -61,4 +61,13 @@ def chatroom_update(_chatroom_update: chatroom_schema.ChatroomUpdate, db: Sessio
     
    
     chatroom_crud.update_chatroom(db=db, db_chatroom=db_chatroom, chatroom_update=_chatroom_update)
+
+@router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
+def chatroom_delete(_chatroom_delete: chatroom_schema.ChatroomDelete, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_chatroom = chatroom_crud.get_chatroom(db, chatroom_id=_chatroom_delete.chatroom_id)
+    if not db_chatroom:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="데이터를 찾을 수 없습니다.")
     
+    if current_user.id != db_chatroom.user.id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="삭제 권한이 없습니다.")
+    chatroom_crud.delete_chatroom(db=db, db_chatroom=db_chatroom)

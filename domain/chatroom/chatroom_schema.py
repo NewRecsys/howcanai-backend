@@ -27,3 +27,7 @@ class ChatroomCreate(BaseModel):
 
 class ChatroomUpdate(ChatroomCreate):
     chatroom_id: UUID
+    
+class ChatroomDelete(BaseModel):
+    chatroom_id: UUID
+    
