@@ -16,7 +16,7 @@ def get_chatroom_list(db: Session):
 #     return chatroom_list
 def get_chatroom_list_user(db: Session, user_id: UUID):
     # 원하는 컬럼을 지정합니다.
-    stmt = select(Chatroom.name, Chatroom.create_date).where(Chatroom.user_id == user_id).order_by(Chatroom.create_date.desc())
+    stmt = select(Chatroom.id, Chatroom.title, Chatroom.create_date).where(Chatroom.user_id == user_id).order_by(Chatroom.create_date.desc())
     result = db.execute(stmt)
     
     # 쿼리 결과를 딕셔너리 형태로 변환합니다.
