@@ -1,6 +1,6 @@
 # howcanai-backend
 
-- Python 3.8+
+- Python 3.9
 - FastAPI, PostgreSQL, SQLAlchemy
 
 ## local
