@@ -11,17 +11,11 @@ def get_chatroom_list(db: Session):
     chatroom_list = db.query(Chatroom).order_by(Chatroom.create_date.desc()).all()
     return chatroom_list
 
-# def get_chatroom_list_user(db: Session, user_id: UUID):
-#     chatroom_list = db.query(Chatroom).filter(Chatroom.user_id == user_id).order_by(Chatroom.create_date.desc()).all()
-#     return chatroom_list
 def get_chatroom_list_user(db: Session, user_id: UUID):
-    # 원하는 컬럼을 지정합니다.
-    stmt = select(Chatroom.id, Chatroom.title, Chatroom.create_date).where(Chatroom.user_id == user_id).order_by(Chatroom.create_date.desc())
-    result = db.execute(stmt)
-    
-    # 쿼리 결과를 딕셔너리 형태로 변환합니다.
-    chatroom_list = [dict(zip(row.keys(), row)) for row in result]
+    chatroom_list = db.query(Chatroom).filter(Chatroom.user_id == user_id).order_by(Chatroom.create_date.desc()).all()
     return chatroom_list
+
+
 
 def get_chatroom(db: Session, chatroom_id: UUID):
     chatroom = db.query(Chatroom).get(chatroom_id)
