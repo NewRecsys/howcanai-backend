@@ -17,3 +17,4 @@ pydantic[email]
 pyyaml
 psycopg2
 bcrypt==4.0.1
+readability-lxml

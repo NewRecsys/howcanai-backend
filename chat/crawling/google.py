@@ -16,6 +16,9 @@ def google_search(args, corpus_list, links):
         response = requests.get(url).json()
         
         for item in response.get("items"):
+            # 중복 방지 (07/24)
+            if item['link'] in links:
+                continue
             if args.calculated_for == 'main_page':
                 corpus_list.append(MainTextExtractor(item['link']).extract_main_content())
             else:
