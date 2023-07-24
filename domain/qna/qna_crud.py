@@ -5,7 +5,6 @@ from chat.run import run_chat
 from datetime import datetime
 from chat.args import parse_args
 
-args = parse_args()
 
 
 def get_qna_list(db: Session):
@@ -15,7 +14,7 @@ def get_qna_list(db: Session):
 
 
 def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate, user: User = None):
-    answer_, references_ = run_chat(args, query = qna_create.query)
+    answer_, references_ = run_chat(parse_args(), query = qna_create.query)
     now = datetime.now()
     db_qna = Qna(
         question=qna_create.query,
