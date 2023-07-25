@@ -11,7 +11,6 @@ from database import get_db
 from domain.user import user_crud, user_schema
 from domain.user.user_crud import pwd_context
 from typing import Optional
-import secrets
 import yaml
 
 with open('env.yaml', 'r') as yaml_conf:
@@ -20,6 +19,7 @@ SECRET = conf['SECRET']
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = SECRET['KEY']
+
 ALGORITHM = "HS256"
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", auto_error=False) # 비로그인도 일단 API 실행
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", auto_error=True) # 비로그인은 즉시 401 오류 발생

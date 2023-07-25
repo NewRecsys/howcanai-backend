@@ -18,3 +18,7 @@ pyyaml
 psycopg2
 bcrypt==4.0.1
 readability-lxml
+kiwipiepy==0.15.2
+pytorch-lightning==2.0.5
+pandas==2.0.3
+adamp==0.3.0

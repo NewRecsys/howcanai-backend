@@ -7,7 +7,7 @@ def parse_args():
     parser.add_argument('--query', type=str, default=None)
     
     parser.add_argument('--use_google', type=int, default=1, help = 'True(1) or False(0)')
-    parser.add_argument('--google_n_pages', type=int, default=2, help='Search for up to 10 items on a page.')
+    parser.add_argument('--google_n_pages', type=int, default=1, help='Search for up to 10 items on a page.')
     parser.add_argument('--use_naver', type=int, default=0, help = 'True(1) or False(0)')
     parser.add_argument('--naver_display', type=int, default=20)
         
