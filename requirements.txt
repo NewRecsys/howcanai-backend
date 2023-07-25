@@ -15,7 +15,7 @@ uvicorn==0.22.0
 python-multipart
 pydantic[email]
 pyyaml
-psycopg2
+psycopg2-binary
 bcrypt==4.0.1
 readability-lxml
 kiwipiepy==0.15.2

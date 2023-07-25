@@ -63,9 +63,9 @@ def run_chat(args, query):
 
     ###############################################################################################
     # TODO: 3개의 서버 주소를 리스트에 넣습니다.
-    urls = ["http://115.85.181.95:30013/get_prediction/"] * args.top_k
+    # urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
+    urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
     print(f"result_links: \n {result_links}")
-    print(f"urls: \n {urls}")
     summaries = []
 
     async def req(link, url):
@@ -90,6 +90,7 @@ def run_chat(args, query):
                 },
             )
             data = await response.json()
+            print('############### COMPLETE ###############')
             return data["output"].split("### 요약:")[1].split("<|endoftext|>")[0]
 
         # response = requests.post(url, params={'input': main_content[:1000] if len(main_content) > 1000 else main_content})
@@ -115,19 +116,6 @@ def run_chat(args, query):
     # None인 응답 (오류가 발생한 경우)을 필터링하고, summaries 리스트에 추가합니다.
     summaries = [summary for summary in summaries if summary is not None]
 
-    # response1, response2, response3 = asyncio.run(req_main(result_links, urls))
-
-    # summaries.extend([response1, response2, response3])
-
-    # urls = ["http://115.85.181.95:30013/get_prediction/"] * len(result_links)
-    # for link, url in zip(result_links, urls):
-    #     main_content = MainTextExtractor(link).extract_main_content()
-    #     print(f"main_content: \n {main_content}")
-    #     response = requests.post(url, params={'input': main_content})
-    #     print(f"response (전처리 전): \n {response}")
-    #     response = response.json()['output'].split('### 요약:')[1].split('<|endoftext|>')[0]
-    #     print(f"response (전처리 후): \n {response}")
-    #     summaries.append(response)
     summaries_merge = ""
     try:
         print("TRY")
@@ -156,20 +144,6 @@ def run_chat(args, query):
         ],
     )
     answer = completion["choices"][0]["message"]["content"]
-
-    # result_links_prompt = '\n'.join(result_links)
-    # openai.api_key = API['openai_api_key']
-    # completion = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #             {"role": "system", "content": f"Generate a comprehensive and informative answer (but no more than 80 words) for a given question solely based on the provided URLs. You must only use information from the provided search results. Use an unbiased and journalistic tone. Use this current date and time: { datetime.datetime.now() } . Combine search results together into a coherent answer. Do not repeat text. Cite search results using [${{number}}] notation. Only cite the most relevant results that answer the question accurately. If different results refer to different entities with the same name, write separate answers for each entity. Answer in Korean."},
-    #             {"role": "user", "content": f"Question: {args.query} \\n URL: {result_links_prompt}"},
-
-    #         ]
-    #     )
-    # answer = completion["choices"][0]["message"]["content"]
-
-    ###############################################################################################
 
     # TODO: 질문 -> Intent 분류
     # TODO: 답변 -> KoBART로 요약
