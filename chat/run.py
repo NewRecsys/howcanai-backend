@@ -31,7 +31,7 @@ def run_chat(args, query):
     kiwi = Kiwi()
     tokens = kiwi.tokenize(query)
     args.query = " ".join(
-        [token.form for token in tokens if token.tag in ["NNG", "NNP", "NR", "NP"]]
+        [token.form for token in tokens if token.tag in ["NNG", "NNP", "NR", "NP", "SN", "SL"]]
     )
 
     print(f"전처리 전 쿼리: {query}, 전처리 후 쿼리: {args.query}")

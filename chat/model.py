@@ -25,7 +25,7 @@ from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 
 tokenizer = PreTrainedTokenizerFast.from_pretrained('digit82/kobart-summarization')
-model = BartForConditionalGeneration.from_pretrained('/opt/ml/howcanai-backend/chat/kobart')
+model = BartForConditionalGeneration.from_pretrained('/opt/ml/backend/chat/kobart')
 
 def kobart(text):
     text = text.replace('\n', ' ')
