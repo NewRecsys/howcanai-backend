@@ -8,7 +8,7 @@ def run_add_query(answer, query, summaries_merge):
     intent = intent_inference(query=query, model='klue/roberta-base', ckpt_path='/opt/ml/backend/chat/ckpt/intent_v1.ckpt')
     
     completion2 = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-16k",
         messages=[
             {
                 "role": "system",
