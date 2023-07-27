@@ -1,11 +1,13 @@
+import os
+
 from chat.args import parse_args
 from chat.topk import get_top_k  # , get_top_k_faiss
 
 from chat.crawling.google import google_search
 from chat.crawling.naver import naver_search
 from chat.crawling.extractor import MainTextExtractor
-# from chat.model import kobart
-from chat.run_add_query import run_add_query
+from chat import run_add_query
+
 import openai
 import datetime
 
@@ -18,7 +20,6 @@ from readability import Document
 from bs4 import BeautifulSoup
 
 from kiwipiepy import Kiwi
-
 
 def run_chat(args, query):
     with open("chat/API.yaml", "r") as yaml_conf:
@@ -40,7 +41,7 @@ def run_chat(args, query):
     if API["naver_client_id"] is None or API["naver_client_secret"] is None:
         raise Exception("Insert your own NAVER Search API into args.py.")
     if args.query is None:
-        raise Exception("--query is required.")
+        raise Exception("—query is required.")
     corpus_list = []
     links = []
     if args.use_google:
@@ -64,6 +65,7 @@ def run_chat(args, query):
 
     ###############################################################################################
     # TODO: 3개의 서버 주소를 리스트에 넣습니다.
+    # urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
     urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/", "http://49.50.160.171:30003/get_prediction/"]
     print(f"result_links: \n {result_links}")
     summaries = []
@@ -84,8 +86,8 @@ def run_chat(args, query):
             response = await session.post(
                 url,
                 params={
-                    "input": main_content[:1000]
-                    if len(main_content) > 1000
+                    "input": main_content[:500]
+                    if len(main_content) > 500
                     else main_content
                 },
             )
@@ -131,22 +133,24 @@ def run_chat(args, query):
 
     openai.api_key = API["openai_api_key"]
     completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-16k",
         messages=[
-            {
-                "role": "system",
-                "content": f"Generate a comprehensive and informative answer (but no more than 80 words) for a given question solely based on the provided Contents. You must only use information from the provided search results. Use an unbiased and journalistic tone. Use this current date and time: { datetime.datetime.now() } . Combine search results together into a coherent answer. Do not repeat text. Cite search results using [${{number}}] notation. Only cite the most relevant results that answer the question accurately. If different results refer to different entities with the same name, write separate answers for each entity. Answer in Korean.",
-            },
+            # {
+            #     "role": "system",
+            #     "content": f"Generate a comprehensive and informative answer (but no more than 80 words) for a given question solely based on the provided Contents. You must only use information from the provided search results. Use an unbiased and journalistic tone. Use this current date and time: { datetime.datetime.now() } . Combine search results together into a coherent answer. Do not repeat text. Cite search results using [${{number}}] notation. Only cite the most relevant results that answer the question accurately. If different results refer to different entities with the same name, write separate answers for each entity. Answer in Korean.",
+            # },
+            # {
+            #     "role": "user",
+            #     "content": f"Question: {query} \\n Contents: {summaries_merge}",
+            # },
             {
                 "role": "user",
-                "content": f"Question: {query} \\n Contents: {summaries_merge}",
+                "content": f"{summaries_merge}, Please generate a response for the given {query} using the following 3 summaries. According to the following rules 1. Keep it under 100 words. 2. Use only the provided summary informations. 3. Write in an unbiased and objective tone. 4. Pay attention to spelling and context 5. Provide answer in Korean",
             },
         ],
     )
     answer = completion["choices"][0]["message"]["content"]
 
-
     nexts = run_add_query(answer, query, summaries_merge)
-    
-    # return에 추가 쿼리 추가할 것
+
     return answer, result_links, nexts
