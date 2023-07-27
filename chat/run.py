@@ -64,7 +64,8 @@ def run_chat(args, query):
     ###############################################################################################
     # TODO: 3개의 서버 주소를 리스트에 넣습니다.
     # urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
-    urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
+    # urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
+    urls = ["http://115.85.181.95:30013/get_prediction/"]
     print(f"result_links: \n {result_links}")
     summaries = []
 

@@ -13,7 +13,7 @@ def parse_args():
         
     parser.add_argument('--calculated_for', type=str, default='snippet', choices=['snippet', 'title', 'main_page'], help='유사도 비교되는 대상')
     parser.add_argument('--use_faiss', type=int, default=0, help = 'True(1) or False(0)')
-    parser.add_argument('--top_k', type=int, default=2)
+    parser.add_argument('--top_k', type=int, default=1)
         
     args = parser.parse_args()
 
