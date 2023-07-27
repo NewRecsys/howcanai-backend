@@ -38,3 +38,4 @@ class Qna(Base):
     chatroom = relationship("Chatroom", backref="qnas")
     user_id = Column(UUID, ForeignKey("user.id"), nullable=True)
     user = relationship("User", backref="qna_users")
+    nexts = Column(ARRAY(Text))

@@ -4,7 +4,8 @@ from chat.topk import get_top_k  # , get_top_k_faiss
 from chat.crawling.google import google_search
 from chat.crawling.naver import naver_search
 from chat.crawling.extractor import MainTextExtractor
-from chat.model import kobart
+# from chat.model import kobart
+from chat.run_add_query import run_add_query
 import openai
 import datetime
 
@@ -63,9 +64,7 @@ def run_chat(args, query):
 
     ###############################################################################################
     # TODO: 3개의 서버 주소를 리스트에 넣습니다.
-    # urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
-    # urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/"]
-    urls = ["http://115.85.181.95:30013/get_prediction/"]
+    urls = ["http://115.85.181.95:30013/get_prediction/", "http://49.50.172.150:40001/get_prediction/", "http://49.50.160.171:30003/get_prediction/"]
     print(f"result_links: \n {result_links}")
     summaries = []
 
@@ -146,10 +145,8 @@ def run_chat(args, query):
     )
     answer = completion["choices"][0]["message"]["content"]
 
-    # TODO: 질문 -> Intent 분류
-    # TODO: 답변 -> KoBART로 요약
-    # TODO: Intent + 요약본 -> GPT 넣어서 추가 쿼리 도출
-    # TODO: 추가 쿼리 -> list에 담고 리턴
 
+    nexts = run_add_query(answer, query, summaries_merge)
+    
     # return에 추가 쿼리 추가할 것
-    return answer, result_links
+    return answer, result_links, nexts

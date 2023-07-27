@@ -10,6 +10,7 @@ class Qna(BaseModel):
     answer: str
     references: List[str]
     create_date: datetime.datetime
+    nexts: List[str]
     
     # Qna 모델의 항목들이 자동으로 Qna 스키마로 매핑 됨
     class Config:

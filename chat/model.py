@@ -2,23 +2,32 @@ import torch
 from transformers import PreTrainedTokenizerFast
 from transformers import BartForConditionalGeneration
 
+import os
+import random
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+import transformers
+from transformers import AutoModel, AutoTokenizer
+from transformers import AdamWeightDecay, AdamW, get_linear_schedule_with_warmup
+from adamp import AdamP
+from transformers import RobertaTokenizerFast, RobertaForSequenceClassification, TextClassificationPipeline 
+
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+import torch
+from torch import nn
+from torch.utils.data import Dataset, DataLoader
+
+import pytorch_lightning as pl
+from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+
 tokenizer = PreTrainedTokenizerFast.from_pretrained('digit82/kobart-summarization')
-model = BartForConditionalGeneration.from_pretrained('digit82/kobart-summarization')
+model = BartForConditionalGeneration.from_pretrained('/opt/ml/howcanai-backend/chat/kobart')
 
 def kobart(text):
-
-    # text = """
-    # '우리나라는 이미 위험이 대형화, 고도화, 집적화 및 복합화된 위험사회로 접어들었다. 그러나 위험을 관리할 법, 제도, 기술, 인력, 재원, 문화 등 안전관리 인프라는 아직도 취약하다.
-    # 그동안 성장위주의 경제개발 정책을 펼쳐왔기 때문이다. 국가의 안전관리 분야는 크게 예방과 사후대처로 구분할 수있다. 
-    # 예방단계에서 안전관리 핵심은 위험생산자가 위험을 관리하도록 하는 것이고 사후대처단계에서의 핵심은 초기의 현장대응 역량강화와 지휘통제체계의 확립이다. 
-    # 현대사회에서 위험은 대부분 경제활동과정에서 창출되는 것으로 누군가에 의해 생산되는 것으로 보아야 한다. 따라서 위험을 생산하는 자에게 위험관리를 하도록 해야 한다. 
-    # 즉, 예방단계에서의 위험관리란 위험생산자가 안전기준과 원칙을제대로 지키도록 하는 것이며, 이를 실현시키는 책임과 권한은 정부에게 있다. 안전관리는 상시적인 집행을 통해서만 가능하므로 이러한 기능을 할 수 있는 적절한 안전관련 정부조직이 필요하다. 
-    # 지난 몇십년동안 우리나라에서 비슷한 안전사고가 반복된 것은 전략이나 계획이 없었기 때문이 아니라 이를실천하고 집행할 추진체계가 적절하지 않은 탓이 크다. 그동안 우리나라 안전관련 정부조직은 양적으로 많은 팽창을 해왔지만 국가 전체의 안전관리 철학이나 안전관리 관점에서 안전관련 정부조직을 체계적으로 설계하고 정비한 적은 거의 없다. 
-    # 안전문제를 경제개발과정에서 발생되는 필요악이나 부작용정도로 인식해 왔기 때문에 안전관련 정부조직을 단편적이고 파편적으로 개편해 왔기 때문이다. 
-    # 고도의 위험사회로 접어든 우리나라에서 안전은 이제 더 이상 필요악이나 경제개발과정에서 나타나는 부작용이 아니라 국민의 생명은 물론 국가의 존립에 필수적인 기본 인프라이며, 경제성장의 발판이라는 점을 인식해야 한다. 
-    # 따라서 안전관련 정부조직을 거시적이고 장기적인 관점에서 재설계하고 정비하는것이 필요하다.'
-    # """
-
     text = text.replace('\n', ' ')
 
     raw_input_ids = tokenizer.encode(text)
@@ -27,4 +36,149 @@ def kobart(text):
     summary_ids = model.generate(torch.tensor([input_ids]),  num_beams=4,  max_length=1024,  eos_token_id=1)
     return tokenizer.decode(summary_ids.squeeze().tolist(), skip_special_tokens=True)
 
-# '1일 0 9시까지 최소 20만3220명이 코로나19에 신규 확진되어 역대 최다 기록을 갈아치웠다.'
+
+class IntentCLSModel(LightningModule):
+    def __init__(self, config):
+        super(IntentCLSModel, self).__init__()
+        self.save_hyperparameters() # self.hparams에 config 저장됨.
+        self.validation_step_outputs = []
+        self.test_step_outputs = []
+        
+        self.config = config
+        self.bert = AutoModel.from_pretrained(self.config.model)
+        self.fc = nn.Linear(self.bert.config.hidden_size, self.config.n_classes)
+        self.criterion = nn.CrossEntropyLoss()
+            
+    def forward(self, *args):
+        output = self.bert(*args)
+        pred = self.fc(output.pooler_output)
+        
+        return pred
+    
+    def configure_optimizers(self):
+        assert self.config.optimizer in ['AdamW', 'AdamP'], 'Only AdamW, AdamP'
+        
+        if self.config.optimizer == 'AdamW':
+            optimizer = AdamW(self.parameters(), lr=self.config.lr, eps=self.config.adam_eps)
+        elif self.config.optimizer == 'AdamP':
+            optimizer = AdamP(self.parameters(), lr=self.config.lr, eps=self.config.adam_eps)
+            
+        scheduler = get_linear_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=self.config.warmup_steps,
+            num_training_steps=self.trainer.estimated_stepping_batches,
+        )
+            
+        return {'optimizer': optimizer,
+                'scheduler': scheduler
+                }
+          
+    def training_step(self, batch, batch_idx):
+        input_ids = batch['input_ids']
+        attention_mask = batch['attention_mask']
+        y = batch['label']
+        y_hat = self.forward(input_ids, attention_mask)
+        
+        loss = self.criterion(y_hat, y)
+        self.log('train_loss', loss, on_epoch=True, logger=True)
+        return loss
+    
+    def validation_step(self, batch, batch_idx):
+        input_ids = batch['input_ids']
+        attention_mask = batch['attention_mask']
+        y = batch['label']
+        y_hat = self.forward(input_ids, attention_mask)
+        
+        loss = self.criterion(y_hat, y)
+        output = {'loss': loss, 'batch_labels': y, 'batch_preds': y_hat}
+        self.validation_step_outputs.append(output)
+        return output
+    
+    def on_validation_epoch_end(self):
+        epoch_labels = torch.cat([x['batch_labels'] for x in self.validation_step_outputs])
+        epoch_preds = torch.cat([x['batch_preds'] for x in self.validation_step_outputs])
+        epoch_loss = self.criterion(epoch_preds, epoch_labels)
+        
+        corrects = (epoch_preds.argmax(dim=1) == epoch_labels).sum().item() 
+        epoch_acc = corrects / len(epoch_labels)
+        self.log('val_loss', epoch_loss, on_epoch=True, logger=True)
+        self.log('val_acc', epoch_acc, on_epoch=True, logger=True)
+        self.validation_step_outputs.clear()
+        return {'val_loss': epoch_loss, 'val_acc': epoch_acc}
+    
+    def test_step(self, batch, batch_idx):
+        input_ids = batch['input_ids']
+        attention_mask = batch['attention_mask']
+        y = batch['label']
+        y_hat = self.forward(input_ids, attention_mask)
+        
+        loss = self.criterion(y_hat, y)
+        output = {'loss': loss, 'batch_labels': y, 'batch_preds': y_hat}
+        self.test_step_outputs.append(output)
+        return output
+    
+    def on_test_epoch_end(self):
+        epoch_labels = torch.cat([x['batch_labels'].detach().cpu() for x in self.test_step_outputs])
+        epoch_preds = torch.cat([x['batch_preds'].detach().cpu() for x in self.test_step_outputs])
+        # epoch_loss = self.criterion(epoch_preds, epoch_labels)
+        
+        acc = accuracy_score(y_true=epoch_labels, y_pred=np.argmax(epoch_preds, axis=1))
+        # average micro macro weighted
+        metrics = [metric(y_true=epoch_labels, y_pred=np.argmax(epoch_preds, axis=1), average='macro' )
+                   for metric in (precision_score, recall_score, f1_score)]
+        
+        # self.log('test_loss', epoch_loss, on_epoch=True, logger=True)
+        self.log('test_acc', acc, on_epoch=True, logger=True)
+        self.log('test_precision', metrics[0], on_epoch=True, logger=True)
+        self.log('test_recall', metrics[1], on_epoch=True, logger=True)
+        self.log('test_f1', metrics[2], on_epoch=True, logger=True)
+        self.test_step_outputs.clear()
+        return {'test_acc': acc, 
+                'test_precision': metrics[0], 'test_recall': metrics[1], 
+                'test_f1': metrics[2]
+                }
+
+
+def intent_inference(query:str, model:str, ckpt_path:str):
+    tokenizer = AutoTokenizer.from_pretrained(model)
+    best_model = IntentCLSModel.load_from_checkpoint(checkpoint_path=ckpt_path, strict=False).to('cpu')
+    
+    category_list = ['거래 의도 (Transactional Intent) - 여행 예약 (Travel Reservations)',
+                     '거래 의도 (Transactional Intent) - 예약 및 예매 (Reservations and Bookings)',
+                     '거래 의도 (Transactional Intent) - 음식 주문 및 배달 (Food Ordering and Delivery)',
+                     '거래 의도 (Transactional Intent) - 이벤트 티켓 예매 (Event Ticket Booking)',
+                     '거래 의도 (Transactional Intent) - 제품 구매 (Product Purchase)',
+                     '네비게이셔널 의도 (Navigational Intent) - 대중교통 및 지도 (Public Transportation and Maps)',
+                     '네비게이셔널 의도 (Navigational Intent) - 여행 및 관광 (Travel and Tourism)',
+                     '네비게이셔널 의도 (Navigational Intent) - 웹사이트/앱 검색 (Website/App Search)',
+                     '네비게이셔널 의도 (Navigational Intent) - 호텔 및 숙박 (Hotels and Accommodation)',
+                     '상업적 정보 조사 의도 (Commercial Intent) - 가전제품 (Electronics)',
+                     '상업적 정보 조사 의도 (Commercial Intent) - 식품 및 요리 레시피 (Food and Recipe)',
+                     '상업적 정보 조사 의도 (Commercial Intent) - 제품 가격 비교 (Product Price Comparison)',
+                     '상업적 정보 조사 의도 (Commercial Intent) - 제품 리뷰 (Product Reviews)',
+                     '상업적 정보 조사 의도 (Commercial Intent) - 패션 및 뷰티 (Fashion and Beauty)',
+                     '정보 제공 의도 (Informational Intent) - 건강 및 의학 (Health and Medicine)',
+                     '정보 제공 의도 (Informational Intent) - 과학 및 기술 (Science and Technology)',
+                     '정보 제공 의도 (Informational Intent) - 역사 (History)',
+                     '정보 제공 의도 (Informational Intent) - 인물 정보 (Biographies)',
+                     '정보 제공 의도 (Informational Intent) - 일반 지식 (General Knowledge)',
+                     '정보 제공 의도 (Informational Intent) - 정치, 사회, 경제 (Politics, Society, Economy)']
+    
+    best_model.eval()
+    best_model.freeze()
+    
+    tokens = tokenizer.encode_plus(
+            query,
+            return_tensors='pt',
+            max_length=32,
+            padding='max_length',
+            truncation=True,
+            # pad_to_max_length=True,
+            add_special_tokens=False
+        )
+    
+    pred = best_model(tokens['input_ids'], tokens['attention_mask'])
+    output_idx = pred.argmax().item()
+    cat = category_list[output_idx]
+    return cat
+

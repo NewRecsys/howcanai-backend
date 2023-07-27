@@ -14,7 +14,7 @@ def get_qna_list(db: Session):
 
 
 def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate, user: User = None):
-    answer_, references_ = run_chat(parse_args(), query = qna_create.query)
+    answer_, references_, nexts_ = run_chat(parse_args(), query = qna_create.query)
     now = datetime.now()
     db_qna = Qna(
         question=qna_create.query,
@@ -23,9 +23,10 @@ def create_qna(db: Session, chatroom: Chatroom, qna_create: QnaCreate, user: Use
         create_date=now,
         chatroom=chatroom,
         user=user,
+        nexts=nexts_,
     )
     db.add(db_qna)
     db.commit()
-    return db_qna.id, qna_create.query, answer_, references_, now
+    return db_qna.id, qna_create.query, answer_, references_, now, nexts_
     
     
