@@ -1,14 +1,18 @@
 # howcanai-backend
 
-- Python 3.9
-- FastAPI, PostgreSQL, SQLAlchemy
+- Ubuntu 18.04.5 LTS
+- Python 3.9.1
 
-## local
+<br>
+
 ```
 pip install -r requirements.txt
-uvicorn main:app --reload
+python main.py
 ```
 
-## server
-```
-```
+
+![image](https://github.com/NewRecsys/howcanai-backend/assets/93419379/f906ee29-541e-49ac-a1f3-5b9219c4110f)
+
+
+
+
