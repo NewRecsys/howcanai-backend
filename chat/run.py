@@ -6,7 +6,7 @@ from chat.topk import get_top_k  # , get_top_k_faiss
 from chat.crawling.google import google_search
 from chat.crawling.naver import naver_search
 from chat.crawling.extractor import MainTextExtractor
-from chat import run_add_query
+from chat.run_add_query import run_add_query
 
 import openai
 import datetime
