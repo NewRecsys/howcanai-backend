@@ -81,13 +81,14 @@ def run_chat(args, query):
         # soup = BeautifulSoup(bs_res.content, 'html.parser')
         # main_content = soup.get_text()
 
+        main_content = main_content.replace('\n', ' ')
         print(f"main_content: \n {main_content}")
         async with aiohttp.ClientSession() as session:
             response = await session.post(
                 url,
                 params={
-                    "input": main_content[:500]
-                    if len(main_content) > 500
+                    "input": main_content[:2500]
+                    if len(main_content) > 2500
                     else main_content
                 },
             )
